@@ -30,8 +30,8 @@ export default function ReceiptLookup() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:py-16">
-      <span className="inline-flex rounded-xl bg-primary-soft p-3 text-primary"><FileSearch className="size-6" /></span>
-      <h1 className="mt-4 text-3xl font-bold tracking-tight">Check a vote receipt</h1>
+      <span className="inline-flex rounded-lg bg-primary-soft p-3 text-primary"><FileSearch className="size-6" /></span>
+      <h1 className="mt-4 font-display text-[34px] font-semibold leading-tight tracking-[-0.01em]">Check a vote receipt</h1>
       <p className="mt-2 text-muted">Enter the receipt code or transaction hash you got after voting. We'll confirm it's recorded on {chain.network || 'the blockchain'}. Your choice is never shown.</p>
 
       <form onSubmit={check} className="mt-8 flex flex-col gap-3 sm:flex-row">

@@ -45,20 +45,20 @@ export default function Ballot() {
         return (
           <div className="mx-auto max-w-3xl">
             <Link to={`/vote/elections/${e.id}`} className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink"><ArrowLeft className="size-4" />Election details</Link>
-            <h1 className="text-2xl font-bold tracking-tight">{e.title}</h1>
+            <h1 className="font-display text-[28px] font-semibold leading-tight tracking-[-0.01em]">{e.title}</h1>
             <p className="mt-1 text-muted">Choose one candidate. You can't change your vote after you submit it.</p>
 
             <fieldset className="mt-6 space-y-3">
               <legend className="sr-only">Candidates</legend>
               {e.candidates.map((c) => (
                 <label key={c.id} className={cn(
-                  'flex cursor-pointer items-center gap-4 rounded-xl border-2 bg-surface p-4 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary',
+                  'flex cursor-pointer items-center gap-4 rounded-lg border-2 bg-surface p-4 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary',
                   choice === c.id ? 'border-primary bg-primary-soft/40' : 'border-line hover:border-primary/40',
                 )}>
                   <input type="radio" name="candidate" value={c.id} checked={choice === c.id} onChange={() => setChoice(c.id)} className="sr-only" />
                   <Avatar name={c.name} size={48} />
                   <div className="min-w-0 flex-1"><div className="font-semibold">{c.name}</div><div className="text-sm text-muted">{c.title}</div></div>
-                  <span className={cn('flex size-6 shrink-0 items-center justify-center rounded-full border-2', choice === c.id ? 'border-primary bg-primary text-white' : 'border-line')}>
+                  <span className={cn('flex size-6 shrink-0 items-center justify-center rounded-full border-2', choice === c.id ? 'border-primary bg-primary text-on-primary' : 'border-line')}>
                     {choice === c.id && <CheckCircle2 className="size-4" />}
                   </span>
                 </label>
@@ -81,7 +81,7 @@ export default function Ballot() {
               {!busy ? (
                 <>
                   <p className="text-sm text-muted">You're voting for:</p>
-                  <div className="mt-3 flex items-center gap-4 rounded-xl border border-line p-4">
+                  <div className="mt-3 flex items-center gap-4 rounded-lg border border-line p-4">
                     <Avatar name={picked?.name} size={48} />
                     <div><div className="font-semibold">{picked?.name}</div><div className="text-sm text-muted">{picked?.title}</div></div>
                   </div>

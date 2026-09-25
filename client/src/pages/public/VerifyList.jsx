@@ -16,7 +16,7 @@ export default function VerifyList() {
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl">
           <span className="inline-flex items-center gap-2 text-sm font-medium text-primary"><ShieldCheck className="size-4" />Public verification</span>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight">Verify any election</h1>
+          <h1 className="mt-2 font-display text-[34px] font-semibold leading-tight tracking-[-0.01em]">Verify any election</h1>
           <p className="mt-2 text-muted">Each election page checks its numbers directly against the blockchain from your browser, so you don't have to trust VoteChain's servers.</p>
         </div>
         <div className="relative w-full lg:w-80">

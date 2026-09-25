@@ -1,4 +1,7 @@
-export const cn = (...c) => c.filter(Boolean).join(' ')
+import { twMerge } from 'tailwind-merge'
+
+// twMerge lets a className passed to a component override its defaults (e.g. a Card's background).
+export const cn = (...c) => twMerge(c.filter(Boolean).join(' '))
 
 const DAY = 86_400_000
 const HOUR = 3_600_000
@@ -63,5 +66,5 @@ export function countdownParts(iso) {
 export const initials = (name = '') =>
   name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('')
 
-const PALETTE = ['#4f46e5', '#0891b2', '#059669', '#d97706', '#db2777', '#7c3aed', '#2563eb', '#dc2626']
+const PALETTE = ['#1d4d3b', '#7a5a2b', '#35557a', '#8c3a26', '#4f4a78', '#5b6a33', '#6d4460', '#2f6364']
 export const colorFor = (seed = '') => PALETTE[[...seed].reduce((a, c) => a + c.charCodeAt(0), 0) % PALETTE.length]

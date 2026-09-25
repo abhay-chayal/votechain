@@ -3,13 +3,20 @@ import { Link } from 'react-router-dom'
 import { Moon, Sun } from 'lucide-react'
 import { cn } from '../lib/utils'
 
+/** A ballot slip going into a box. */
+export const LogoMark = ({ className }) => (
+  <svg viewBox="0 0 32 32" className={cn('size-7', className)} aria-hidden>
+    <rect x="10" y="2.5" width="12" height="13" rx="1.2" fill="var(--surface)" stroke="var(--primary)" strokeWidth="1.8" />
+    <path d="M13 8.6l2.1 2.1 3.9-4.1" fill="none" stroke="var(--stamp)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M3.5 14.5h25v11.5a2.5 2.5 0 0 1-2.5 2.5H6a2.5 2.5 0 0 1-2.5-2.5z" fill="var(--primary)" />
+    <rect x="8" y="17.6" width="16" height="1.8" rx=".9" fill="var(--on-primary)" opacity=".45" />
+  </svg>
+)
+
 export const Logo = ({ className, to = '/' }) => (
-  <Link to={to} className={cn('inline-flex items-center gap-2 font-bold tracking-tight', className)}>
-    <svg viewBox="0 0 32 32" className="size-8" aria-hidden>
-      <rect width="32" height="32" rx="8" fill="var(--primary)" />
-      <path d="M9 16.5l4.5 4.5L23 11.5" stroke="#fff" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-    <span className="text-lg">VoteChain</span>
+  <Link to={to} className={cn('inline-flex items-center gap-2', className)}>
+    <LogoMark />
+    <span className="font-display text-[21px] font-semibold tracking-[-0.01em]">VoteChain</span>
   </Link>
 )
 
@@ -22,10 +29,10 @@ export function ThemeToggle({ className }) {
   return (
     <button
       onClick={() => setDark((d) => !d)}
-      className={cn('rounded-lg p-2 text-muted hover:bg-surface-2 hover:text-ink', className)}
+      className={cn('rounded-md p-2 text-muted hover:bg-surface-2 hover:text-ink', className)}
       aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}
     >
-      {dark ? <Sun className="size-5" /> : <Moon className="size-5" />}
+      {dark ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
     </button>
   )
 }

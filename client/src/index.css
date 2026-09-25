@@ -2,46 +2,53 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Warm paper, deep ink, ballot green. Vermilion ("stamp") is used sparingly for live/recorded marks. */
 :root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --surface-2: #f1f3f6;
-  --line: #e3e6eb;
-  --ink: #0f172a;
-  --muted: #5b6475;
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-soft: #eef0ff;
-  --primary-ink: #3730a3;
-  --success: #047857;
-  --success-soft: #e7f6ef;
-  --warning: #b45309;
-  --warning-soft: #fdf3e2;
-  --danger: #c02626;
-  --danger-soft: #fdecec;
-  --info: #0369a1;
-  --info-soft: #e6f3fb;
+  --bg: #f5f2eb;
+  --surface: #fffdf8;
+  --surface-2: #efebe1;
+  --line: #ddd6c7;
+  --line-strong: #c9c0ad;
+  --ink: #1b1a17;
+  --muted: #6a665c;
+  --primary: #1f4d3b;
+  --primary-hover: #173d2e;
+  --primary-soft: #e4ece4;
+  --primary-ink: #173f30;
+  --on-primary: #fffdf8;
+  --stamp: #b3401e;
+  --success: #2d6a3e;
+  --success-soft: #e3eee2;
+  --warning: #9a5b0c;
+  --warning-soft: #f7ecd8;
+  --danger: #a8321f;
+  --danger-soft: #f7e3dd;
+  --info: #2e5476;
+  --info-soft: #e2eaf1;
 }
 
 .dark {
-  --bg: #0b0f17;
-  --surface: #121826;
-  --surface-2: #1a2131;
-  --line: #262f42;
-  --ink: #e7eaf0;
-  --muted: #98a2b5;
-  --primary: #7c83ff;
-  --primary-hover: #969cff;
-  --primary-soft: #1e2246;
-  --primary-ink: #c3c7ff;
-  --success: #34d399;
-  --success-soft: #0f2a22;
-  --warning: #fbbf24;
-  --warning-soft: #2e2410;
-  --danger: #f87171;
-  --danger-soft: #331517;
-  --info: #38bdf8;
-  --info-soft: #0f2533;
+  --bg: #121310;
+  --surface: #1a1b17;
+  --surface-2: #23241f;
+  --line: #33342d;
+  --line-strong: #474840;
+  --ink: #ebe8df;
+  --muted: #a29f93;
+  --primary: #86bb9c;
+  --primary-hover: #9ccaaf;
+  --primary-soft: #1f2d26;
+  --primary-ink: #b9dcc6;
+  --on-primary: #10160f;
+  --stamp: #e0714f;
+  --success: #86c492;
+  --success-soft: #1d2b20;
+  --warning: #e0ab5a;
+  --warning-soft: #2e2615;
+  --danger: #ea8b74;
+  --danger-soft: #34201b;
+  --info: #8fb4d6;
+  --info-soft: #1b2632;
 }
 
 @theme inline {
@@ -49,12 +56,15 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-soft: var(--primary-soft);
   --color-primary-ink: var(--primary-ink);
+  --color-on-primary: var(--on-primary);
+  --color-stamp: var(--stamp);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
@@ -63,8 +73,9 @@
   --color-danger-soft: var(--danger-soft);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Source Serif 4", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
 html, body, #root { min-height: 100%; }
@@ -73,12 +84,26 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: "tnum" 0;
 }
+::selection { background: var(--primary); color: var(--surface); }
 
 /* Let wide children (tables, hashes) scroll inside grid cells instead of stretching the page. */
 .grid > * { min-width: 0; }
+
+/* A torn/perforated paper edge for receipts. */
+.perforated {
+  background-image: radial-gradient(circle at 8px 0, var(--bg) 5px, transparent 5.5px);
+  background-size: 16px 10px;
+  background-repeat: repeat-x;
+}
 
 @keyframes fade-in { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: none } }
 .animate-fade-in { animation: fade-in .25s ease-out both; }
 @keyframes pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
 .animate-pulse-dot { animation: pulse-dot 1.4s ease-in-out infinite; }
+@keyframes stamp-in { from { opacity: 0; transform: rotate(-8deg) scale(1.4) } to { opacity: .9; transform: rotate(-8deg) scale(1) } }
+.animate-stamp { animation: stamp-in .35s cubic-bezier(.2,.8,.2,1) .3s both; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in, .animate-pulse-dot, .animate-stamp { animation: none; }
+}

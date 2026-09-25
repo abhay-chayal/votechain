@@ -61,7 +61,7 @@ export function ResultsBars({ election }) {
                 <div className="text-xs text-muted tabular-nums">{fmtNum(c.votes)} {c.votes === 1 ? "vote" : "votes"}</div>
               </div>
             </div>
-            <Progress value={pct} className="h-2.5" tone={winner ? 'bg-success' : 'bg-primary'} />
+            <Progress value={pct} className="h-2.5" tone={winner ? 'bg-primary' : 'bg-muted/45'} />
           </div>
         )
       })}
@@ -70,7 +70,7 @@ export function ResultsBars({ election }) {
 }
 
 export const SealedResults = ({ election }) => (
-  <div className="flex flex-col items-center rounded-xl border border-dashed border-line bg-surface-2/50 px-6 py-10 text-center">
+  <div className="flex flex-col items-center rounded-lg border border-dashed border-line bg-surface-2/50 px-6 py-10 text-center">
     <span className="mb-3 rounded-full bg-surface p-3 text-muted"><Lock className="size-5" /></span>
     <h4 className="font-semibold">Results are sealed until voting closes</h4>
     <p className="mt-1 max-w-sm text-sm text-muted">

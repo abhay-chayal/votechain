@@ -51,13 +51,13 @@ export default function RegisterOrg() {
 
   return (
     <div className="mx-auto max-w-xl px-4 py-12 sm:py-16">
-      <h1 className="text-2xl font-bold tracking-tight">Register your organization</h1>
+      <h1 className="font-display text-[28px] font-semibold leading-tight tracking-[-0.01em]">Register your organization</h1>
       <p className="mt-1 text-muted">Takes two minutes. You can set up elections right away; publishing opens once VoteChain approves your organization, usually within one working day.</p>
 
       <ol className="my-8 flex items-center gap-3 text-sm">
         {['Organization', 'Your account'].map((l, i) => (
           <li key={l} className="flex flex-1 items-center gap-2">
-            <span className={cn('flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold', i <= step ? 'bg-primary text-white' : 'bg-surface-2 text-muted')}>
+            <span className={cn('flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold', i <= step ? 'bg-primary text-on-primary' : 'bg-surface-2 text-muted')}>
               {i < step ? <Check className="size-4" /> : i + 1}
             </span>
             <span className={cn('font-medium', i > step && 'text-muted')}>{l}</span>

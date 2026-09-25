@@ -6,19 +6,19 @@ import { useChainInfo } from '../store/chain'
 
 export function Button({ as: As = 'button', to, variant = 'primary', size = 'md', className, children, ...props }) {
   const variants = {
-    primary: 'bg-primary text-white hover:bg-primary-hover shadow-sm',
-    secondary: 'bg-surface text-ink border border-line hover:bg-surface-2',
+    primary: 'bg-primary text-on-primary hover:bg-primary-hover',
+    secondary: 'bg-surface text-ink border border-line-strong hover:bg-surface-2',
     ghost: 'text-muted hover:text-ink hover:bg-surface-2',
-    danger: 'bg-danger text-white hover:opacity-90',
-    soft: 'bg-primary-soft text-primary-ink hover:opacity-90',
+    danger: 'bg-danger text-on-primary hover:opacity-90',
+    soft: 'bg-primary-soft text-primary-ink hover:bg-primary-soft/70',
   }
-  const sizes = { sm: 'h-8 px-3 text-sm gap-1.5', md: 'h-10 px-4 text-sm gap-2', lg: 'h-12 px-6 text-base gap-2' }
+  const sizes = { sm: 'h-8 px-3 text-[13px] gap-1.5', md: 'h-10 px-4 text-sm gap-2', lg: 'h-11 px-5 text-[15px] gap-2' }
   const Comp = to && !props.disabled ? Link : As
   return (
     <Comp
       to={to && !props.disabled ? to : undefined}
       className={cn(
-        'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap',
+        'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap',
         variants[variant], sizes[size], className,
       )}
       {...props}
@@ -29,13 +29,13 @@ export function Button({ as: As = 'button', to, variant = 'primary', size = 'md'
 }
 
 export const Card = ({ className, children, ...p }) => (
-  <div className={cn('rounded-xl border border-line bg-surface', className)} {...p}>{children}</div>
+  <div className={cn('rounded-md border border-line bg-surface', className)} {...p}>{children}</div>
 )
 
 export const CardHeader = ({ title, subtitle, action, className }) => (
   <div className={cn('flex items-start justify-between gap-4 border-b border-line px-5 py-4', className)}>
     <div className="min-w-0">
-      <h3 className="font-semibold">{title}</h3>
+      <h3 className="text-[15px] font-semibold">{title}</h3>
       {subtitle && <p className="mt-0.5 text-sm text-muted">{subtitle}</p>}
     </div>
     {action}
@@ -50,21 +50,22 @@ const tones = {
   danger: 'bg-danger-soft text-danger',
   info: 'bg-info-soft text-info',
 }
+/** Small uppercase label, styled like a rubber stamp rather than a pill. */
 export const Badge = ({ tone = 'neutral', className, children }) => (
-  <span className={cn('inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium', tones[tone], className)}>{children}</span>
+  <span className={cn('inline-flex items-center gap-1.5 whitespace-nowrap rounded-[3px] px-1.5 py-[3px] text-[10.5px] font-semibold uppercase leading-none tracking-[0.07em]', tones[tone], className)}>{children}</span>
 )
 
 const STATUS = {
   live: ['success', 'Live'], scheduled: ['info', 'Scheduled'], draft: ['neutral', 'Draft'],
-  closed: ['warning', 'Closed'], published: ['primary', 'Results published'],
+  closed: ['warning', 'Closed'], published: ['primary', 'Results out'],
   active: ['success', 'Active'], pending: ['warning', 'Pending review'], suspended: ['danger', 'Suspended'],
-  voted: ['success', 'Voted'], registered: ['info', 'Registered'], invited: ['neutral', 'Invited'],
+  voted: ['success', 'Voted'], registered: ['info', 'Signed in'], invited: ['neutral', 'Invited'],
 }
 export function StatusBadge({ status }) {
   const [tone, label] = STATUS[status] || ['neutral', status]
   return (
     <Badge tone={tone}>
-      {status === 'live' && <span className="size-1.5 rounded-full bg-current animate-pulse-dot" />}
+      {status === 'live' && <span className="size-1.5 rounded-full bg-stamp animate-pulse-dot" />}
       {label}
     </Badge>
   )
@@ -73,8 +74,8 @@ export function StatusBadge({ status }) {
 export function Avatar({ name, size = 40, className }) {
   return (
     <span
-      className={cn('inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white', className)}
-      style={{ width: size, height: size, background: colorFor(name), fontSize: size * 0.38 }}
+      className={cn('inline-flex shrink-0 items-center justify-center rounded-full font-medium text-[#fffdf8]', className)}
+      style={{ width: size, height: size, background: colorFor(name), fontSize: size * 0.36 }}
       aria-hidden
     >
       {initials(name)}
@@ -83,29 +84,27 @@ export function Avatar({ name, size = 40, className }) {
 }
 
 export const PageHeader = ({ title, subtitle, actions, back }) => (
-  <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <div className="mb-7 flex flex-col gap-4 border-b border-line pb-6 sm:flex-row sm:items-end sm:justify-between">
     <div className="min-w-0">
       {back}
-      <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-      {subtitle && <p className="mt-1 text-muted">{subtitle}</p>}
+      <h1 className="font-display text-[28px] font-semibold leading-tight tracking-[-0.01em] sm:text-[32px]">{title}</h1>
+      {subtitle && <p className="mt-1.5 text-muted">{subtitle}</p>}
     </div>
     {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
   </div>
 )
 
-export const StatCard = ({ label, value, hint, icon: Icon, tone = 'primary' }) => (
-  <Card className="p-5">
-    <div className="flex items-center justify-between">
-      <span className="text-sm text-muted">{label}</span>
-      {Icon && <span className={cn('rounded-lg p-2', tones[tone])}><Icon className="size-4" /></span>}
-    </div>
-    <div className="mt-3 text-2xl font-bold tracking-tight">{value}</div>
-    {hint && <div className="mt-1 text-xs text-muted">{hint}</div>}
+// eslint-disable-next-line no-unused-vars
+export const StatCard = ({ label, value, hint, icon, tone }) => (
+  <Card className="px-5 py-4">
+    <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">{label}</div>
+    <div className="mt-2 font-display text-[30px] font-semibold leading-none tabular-nums">{value}</div>
+    {hint && <div className="mt-2 text-xs text-muted">{hint}</div>}
   </Card>
 )
 
 export const Progress = ({ value, className, tone = 'bg-primary' }) => (
-  <div className={cn('h-2 w-full overflow-hidden rounded-full bg-surface-2', className)}>
+  <div className={cn('h-1.5 w-full overflow-hidden rounded-full bg-surface-2', className)}>
     <div className={cn('h-full rounded-full transition-all duration-700', tone)} style={{ width: `${Math.min(100, value)}%` }} />
   </div>
 )
@@ -120,7 +119,7 @@ export function Field({ label, hint, error, children, className }) {
   )
 }
 
-const inputCls = 'w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted/70 focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/15'
+const inputCls = 'w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted/70 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60'
 export const Input = ({ className, ...p }) => <input className={cn(inputCls, 'h-10', className)} {...p} />
 export const Textarea = ({ className, ...p }) => <textarea className={cn(inputCls, 'min-h-24', className)} {...p} />
 export const Select = ({ className, children, ...p }) => <select className={cn(inputCls, 'h-10', className)} {...p}>{children}</select>
@@ -134,10 +133,10 @@ export function Modal({ open, onClose, title, children, footer, dismissible = tr
   }, [open, dismissible, onClose])
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center" onClick={() => dismissible && onClose?.()}>
-      <div role="dialog" aria-modal="true" className="animate-fade-in w-full max-w-lg rounded-2xl border border-line bg-surface shadow-2xl" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#1b1a17]/45 p-4 sm:items-center" onClick={() => dismissible && onClose?.()}>
+      <div role="dialog" aria-modal="true" className="animate-fade-in w-full max-w-lg rounded-md border border-line bg-surface shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
-          <h2 className="font-semibold">{title}</h2>
+          <h2 className="font-display text-lg font-semibold">{title}</h2>
           {dismissible && <button onClick={onClose} className="rounded-md p-1 text-muted hover:bg-surface-2" aria-label="Close"><X className="size-4" /></button>}
         </div>
         <div className="px-5 py-5">{children}</div>
@@ -169,7 +168,7 @@ export function Tabs({ tabs, value, onChange }) {
 
 export const EmptyState = ({ icon: Icon, title, text, action }) => (
   <div className="flex flex-col items-center px-6 py-14 text-center">
-    {Icon && <span className="mb-4 rounded-2xl bg-surface-2 p-4 text-muted"><Icon className="size-6" /></span>}
+    {Icon && <span className="mb-4 rounded-lg bg-surface-2 p-4 text-muted"><Icon className="size-6" /></span>}
     <h3 className="font-semibold">{title}</h3>
     {text && <p className="mt-1 max-w-sm text-sm text-muted">{text}</p>}
     {action && <div className="mt-5">{action}</div>}
@@ -248,7 +247,7 @@ export const PageLoader = () => (
 export function ErrorState({ error, onRetry }) {
   return (
     <Card className="flex flex-col items-center px-6 py-14 text-center">
-      <span className="mb-4 rounded-2xl bg-danger-soft p-4 text-danger"><AlertTriangle className="size-6" /></span>
+      <span className="mb-4 rounded-lg bg-danger-soft p-4 text-danger"><AlertTriangle className="size-6" /></span>
       <h3 className="font-semibold">{error?.status === 404 ? 'Not found' : 'Something went wrong'}</h3>
       <p className="mt-1 max-w-sm text-sm text-muted">{error?.message || 'Please try again.'}</p>
       {onRetry && error?.status !== 404 && <Button variant="secondary" className="mt-5" onClick={() => onRetry()}>Try again</Button>}

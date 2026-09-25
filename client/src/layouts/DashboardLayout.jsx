@@ -70,8 +70,8 @@ export default function DashboardLayout({ role }) {
           <NavLink
             key={to} to={to} end={end}
             className={({ isActive }) => cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-              (match ? match(pathname) : isActive) ?'bg-primary-soft text-primary-ink' : 'text-muted hover:bg-surface-2 hover:text-ink',
+              'flex items-center gap-3 rounded-[4px] px-3 py-2 text-sm font-medium transition-colors',
+              (match ? match(pathname) : isActive) ? 'bg-surface-2 text-ink shadow-[inset_2px_0_0_var(--primary)]' : 'text-muted hover:bg-surface-2/70 hover:text-ink',
             )}
           >
             <Icon className="size-4.5" />{label}
@@ -113,7 +113,7 @@ export default function DashboardLayout({ role }) {
               </span>
             </button>
             {menu && (
-              <div className="animate-fade-in absolute right-0 mt-2 w-56 rounded-xl border border-line bg-surface p-1.5 shadow-lg">
+              <div className="animate-fade-in absolute right-0 mt-2 w-56 rounded-lg border border-line bg-surface p-1.5 shadow-lg">
                 {role === 'voter' && (
                   <button onClick={() => { setMenu(false); navigate('/vote/profile') }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-surface-2"><User className="size-4" />Profile</button>
                 )}

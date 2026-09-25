@@ -194,7 +194,7 @@ export default function ElectionEditor() {
           <div className="space-y-4">
             <ErrorText>{errors.candidates}</ErrorText>
             {f.candidates.map((c, i) => (
-              <div key={c.id} className="rounded-xl border border-line p-4">
+              <div key={c.id} className="rounded-lg border border-line p-4">
                 <div className="flex items-start gap-4">
                   <Avatar name={c.name || '?'} size={48} className="hidden sm:inline-flex" />
                   <div className="grid flex-1 gap-3 sm:grid-cols-2">
@@ -217,7 +217,7 @@ export default function ElectionEditor() {
             <div>
               <h3 className="font-semibold">Upload a CSV</h3>
               <p className="mt-1 text-sm text-muted">Columns: <code className="font-mono text-xs">name, email, member id</code>. Each voter gets an email invite when you publish.</p>
-              <label className="mt-4 flex cursor-pointer flex-col items-center rounded-xl border-2 border-dashed border-line px-6 py-10 text-center hover:border-primary">
+              <label className="mt-4 flex cursor-pointer flex-col items-center rounded-lg border-2 border-dashed border-line px-6 py-10 text-center hover:border-primary">
                 <FileUp className="size-7 text-muted" />
                 <span className="mt-3 text-sm font-medium">{fileVoters ? fileVoters.name : 'Choose a CSV file'}</span>
                 <span className="mt-1 text-xs text-muted">{fileVoters ? `${fmtNum(fileVoters.voters.length)} voters found` : 'Up to 10,000 rows'}</span>
@@ -262,7 +262,7 @@ export default function ElectionEditor() {
               ))}
             </div>
             {isDraft && (
-              <div className="flex gap-3 rounded-xl border border-primary/30 bg-primary-soft p-4 text-sm text-primary-ink">
+              <div className="flex gap-3 rounded-lg border border-primary/30 bg-primary-soft p-4 text-sm text-primary-ink">
                 <Blocks className="size-5 shrink-0" />
                 <p>Publishing writes this election to the VoteChain contract and emails every voter. The voting window, candidates and voter list can be changed only until voting opens. VoteChain pays the gas.</p>
               </div>

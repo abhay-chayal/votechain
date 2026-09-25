@@ -70,7 +70,7 @@ export default function VerifyElection() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-2"><StatusBadge status={status} /><Badge>{e.category}</Badge></div>
-                  <h1 className="mt-3 text-3xl font-bold tracking-tight">{e.title}</h1>
+                  <h1 className="mt-3 font-display text-[34px] font-semibold leading-tight tracking-[-0.01em]">{e.title}</h1>
                   <p className="mt-1 text-muted">{e.org?.name}</p>
                 </div>
                 {status === 'live' && <Countdown to={e.endAt} label="Voting closes in" />}
@@ -117,7 +117,7 @@ export default function VerifyElection() {
                     </dl>
                   </Card>
                   <IntegrityChecks election={e} />
-                  <Link to="/receipt" className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4 text-sm hover:border-primary">
+                  <Link to="/receipt" className="flex items-center gap-3 rounded-lg border border-line bg-surface p-4 text-sm hover:border-primary">
                     <FileSearch className="size-5 text-primary" />
                     <span><span className="block font-medium">Voted in this election?</span><span className="text-muted">Check that your receipt is on-chain</span></span>
                   </Link>

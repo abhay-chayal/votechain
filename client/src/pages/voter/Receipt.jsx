@@ -28,7 +28,7 @@ export default function Receipt() {
           <div className="mx-auto max-w-2xl">
             <div className="text-center">
               <span className="inline-flex rounded-full bg-success-soft p-4 text-success"><CheckCircle2 className="size-8" /></span>
-              <h1 className="mt-4 text-2xl font-bold tracking-tight">{state?.fresh ? 'Your vote is recorded' : 'Vote receipt'}</h1>
+              <h1 className="mt-4 font-display text-[28px] font-semibold leading-tight tracking-[-0.01em]">{state?.fresh ? 'Your vote is recorded' : 'Vote receipt'}</h1>
               <p className="mt-1 text-muted">It's permanently on the blockchain. Keep this receipt code to check it later.</p>
             </div>
 
@@ -51,7 +51,7 @@ export default function Receipt() {
               </dl>
             </Card>
 
-            <div className="mt-4 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm text-primary-ink">
+            <div className="mt-4 flex gap-3 rounded-lg bg-primary-soft p-4 text-sm text-primary-ink">
               <ShieldCheck className="size-5 shrink-0" />
               <p>Your receipt proves your vote was counted, but not whom you voted for. So nobody can pressure you into showing it.</p>
             </div>

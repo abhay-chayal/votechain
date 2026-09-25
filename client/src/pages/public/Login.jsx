@@ -56,7 +56,7 @@ export default function Login() {
   return (
     <div className={cn('mx-auto grid gap-8 px-4 py-12 sm:py-16', SHOW_DEMO ? 'max-w-5xl lg:grid-cols-[1fr_380px]' : 'max-w-lg')}>
       <Card className="p-6 sm:p-8">
-        <h1 className="text-2xl font-bold tracking-tight">Sign in to VoteChain</h1>
+        <h1 className="font-display text-[28px] font-semibold leading-tight tracking-[-0.01em]">Sign in to VoteChain</h1>
         <p className="mt-1 text-muted">Voters sign in with the email address their organization invited.</p>
 
         <div className="mt-6 grid grid-cols-2 rounded-lg bg-surface-2 p-1 text-sm font-medium">
@@ -104,7 +104,7 @@ export default function Login() {
           <div className="mt-4 space-y-3">
             {demos.map(({ email: e, icon: Icon, title, text }) => (
               <button key={e} disabled={busy} onClick={() => run(async () => done(await login(e, DEMO_PASSWORD)))}
-                className="flex w-full items-center gap-4 rounded-xl border border-line bg-surface p-4 text-left transition hover:border-primary hover:shadow-sm disabled:opacity-60">
+                className="flex w-full items-center gap-4 rounded-lg border border-line bg-surface p-4 text-left transition hover:border-primary hover:shadow-sm disabled:opacity-60">
                 <span className="rounded-lg bg-primary-soft p-2.5 text-primary"><Icon className="size-5" /></span>
                 <span>
                   <span className="block font-medium">{title}</span>

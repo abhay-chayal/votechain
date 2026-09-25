@@ -25,7 +25,7 @@ export default function VoterElection() {
                 <div className="flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-end lg:justify-between">
                   <div className="max-w-2xl">
                     <div className="flex flex-wrap gap-2"><StatusBadge status={status} /><Badge>{e.category}</Badge></div>
-                    <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">{e.title}</h1>
+                    <h1 className="mt-3 font-display text-[28px] font-semibold leading-tight tracking-[-0.01em] sm:text-[34px]">{e.title}</h1>
                     <p className="mt-1 text-sm text-muted">{org?.name} · {fmtDateTime(e.startAt)} – {fmtDateTime(e.closedAt || e.endAt)}</p>
                     <p className="mt-4 whitespace-pre-line text-muted">{e.description}</p>
                   </div>
