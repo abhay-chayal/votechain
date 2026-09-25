@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Check, Copy, ExternalLink, X } from 'lucide-react'
+import { AlertTriangle, Check, Copy, ExternalLink, Loader2, X } from 'lucide-react'
 import { cn, colorFor, countdownParts, initials, shortHash } from '../lib/utils'
-import { CHAIN } from '../data/seed'
+import { useChainInfo } from '../store/chain'
 
 export function Button({ as: As = 'button', to, variant = 'primary', size = 'md', className, children, ...props }) {
   const variants = {
@@ -191,13 +191,15 @@ export function CopyButton({ value, className }) {
 }
 
 export function Hash({ value, kind = 'tx', full = false }) {
+  const { explorer } = useChainInfo()
   const path = kind === 'address' ? 'address' : 'tx'
+  if (!value) return <span className="text-muted">—</span>
   return (
     <span className="inline-flex max-w-full items-center gap-1 font-mono text-xs">
       <span className="truncate">{full ? value : shortHash(value)}</span>
       <CopyButton value={value} />
-      {kind !== 'token' && (
-        <a href={`${CHAIN.explorer}/${path}/${value}`} target="_blank" rel="noreferrer" className="rounded p-1 text-muted hover:bg-surface-2 hover:text-ink" aria-label="Open in block explorer">
+      {kind !== 'token' && explorer && (
+        <a href={`${explorer}/${path}/${value}`} target="_blank" rel="noreferrer" className="rounded p-1 text-muted hover:bg-surface-2 hover:text-ink" aria-label="Open in block explorer">
           <ExternalLink className="size-3.5" />
         </a>
       )}
@@ -236,3 +238,29 @@ export const Table = ({ head, children }) => (
   </div>
 )
 export const Td = ({ className, children, ...p }) => <td className={cn('px-5 py-3.5 align-middle', className)} {...p}>{children}</td>
+
+export const Spinner = ({ className }) => <Loader2 className={cn('size-5 animate-spin text-primary', className)} />
+
+export const PageLoader = () => (
+  <div className="flex justify-center py-24" aria-label="Loading"><Spinner className="size-7" /></div>
+)
+
+export function ErrorState({ error, onRetry }) {
+  return (
+    <Card className="flex flex-col items-center px-6 py-14 text-center">
+      <span className="mb-4 rounded-2xl bg-danger-soft p-4 text-danger"><AlertTriangle className="size-6" /></span>
+      <h3 className="font-semibold">{error?.status === 404 ? 'Not found' : 'Something went wrong'}</h3>
+      <p className="mt-1 max-w-sm text-sm text-muted">{error?.message || 'Please try again.'}</p>
+      {onRetry && error?.status !== 404 && <Button variant="secondary" className="mt-5" onClick={() => onRetry()}>Try again</Button>}
+    </Card>
+  )
+}
+
+/** Renders loading / error states for a useApi() result, then children(data). */
+export function Async({ q, children }) {
+  if (q.loading && !q.data) return <PageLoader />
+  if (q.error && !q.data) return <ErrorState error={q.error} onRetry={q.reload} />
+  return q.data ? children(q.data) : null
+}
+
+export const ErrorText = ({ children }) => children ? <p className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">{children}</p> : null

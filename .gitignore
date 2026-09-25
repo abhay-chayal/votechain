@@ -3,9 +3,14 @@ dist/
 .env
 .env.*
 !.env.example
+!server/test/.env.test
 *.log
 .DS_Store
 # Hardhat
 contracts/artifacts/
 contracts/cache/
 contracts/typechain-types/
+
+# Local chain deployments change on every run
+server/src/chain/deployment.localhost.json
+server/node_modules/.cache/

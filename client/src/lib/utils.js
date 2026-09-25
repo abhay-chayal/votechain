@@ -33,7 +33,7 @@ export function electionStatus(e, now = Date.now()) {
   return 'closed'
 }
 
-export const totalVotes = (e) => Object.values(e.tally || {}).reduce((a, b) => a + b, 0)
+export const totalVotes = (e) => e.votesCast ?? Object.values(e.tally || {}).reduce((a, b) => a + b, 0)
 export const turnout = (e) => (e.eligible ? Math.round((totalVotes(e) / e.eligible) * 1000) / 10 : 0)
 
 export const fmtDate = (iso) =>

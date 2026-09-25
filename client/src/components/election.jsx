@@ -18,7 +18,7 @@ export function ElectionCard({ election, org, to, footer }) {
           <CalendarClock className="size-4" />
           {status === 'scheduled' && <>Opens {relTime(election.startAt)}</>}
           {status === 'live' && <>Closes {relTime(election.endAt)}</>}
-          {(status === 'closed' || status === 'published') && <>Closed {fmtDateTime(election.endAt)}</>}
+          {(status === 'closed' || status === 'published') && <>Closed {fmtDateTime(election.closedAt || election.endAt)}</>}
           {status === 'draft' && <>Draft · planned {fmtDateTime(election.startAt)}</>}
         </div>
         <div className="flex items-center gap-2"><Users className="size-4" />{election.candidates.length} candidates · {fmtNum(election.eligible)} eligible</div>
@@ -58,7 +58,7 @@ export function ResultsBars({ election }) {
               </div>
               <div className="text-right">
                 <div className="font-semibold tabular-nums">{pct.toFixed(1)}%</div>
-                <div className="text-xs text-muted tabular-nums">{fmtNum(c.votes)} votes</div>
+                <div className="text-xs text-muted tabular-nums">{fmtNum(c.votes)} {c.votes === 1 ? "vote" : "votes"}</div>
               </div>
             </div>
             <Progress value={pct} className="h-2.5" tone={winner ? 'bg-success' : 'bg-primary'} />

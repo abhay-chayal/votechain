@@ -5,10 +5,10 @@ import {
   ShieldCheck, User, Vote, X, Blocks,
 } from 'lucide-react'
 import { Logo, ThemeToggle } from '../components/brand'
-import { Avatar, Badge } from '../components/ui'
-import { useStore } from '../store/AppStore'
+import { Avatar, Badge, PageLoader } from '../components/ui'
+import { useAuth } from '../store/auth'
+import { useChainInfo } from '../store/chain'
 import { cn } from '../lib/utils'
-import { CHAIN } from '../data/seed'
 
 const NAV = {
   org_admin: [
@@ -32,7 +32,8 @@ const NAV = {
 const ROLE_LABEL = { org_admin: 'Organization admin', voter: 'Voter', platform_admin: 'Platform admin' }
 
 export default function DashboardLayout({ role }) {
-  const { user, logout, orgById } = useStore()
+  const { user, ready, logout } = useAuth()
+  const chain = useChainInfo()
   const [open, setOpen] = useState(false)
   const [menu, setMenu] = useState(false)
   const menuRef = useRef(null)
@@ -46,10 +47,11 @@ export default function DashboardLayout({ role }) {
     return () => document.removeEventListener('mousedown', onDoc)
   }, [])
 
+  if (!ready) return <PageLoader />
   if (!user) return <Navigate to="/login" state={{ from: pathname }} replace />
   if (user.role !== role) return <Navigate to={{ platform_admin: '/admin', org_admin: '/org', voter: '/vote' }[user.role]} replace />
 
-  const org = user.orgId && orgById(user.orgId)
+  const org = user.org
 
   const sidebar = (
     <div className="flex h-full flex-col">
@@ -77,8 +79,11 @@ export default function DashboardLayout({ role }) {
         ))}
       </nav>
       <div className="m-3 rounded-lg border border-line p-3 text-xs">
-        <div className="flex items-center gap-2 font-medium"><Blocks className="size-4 text-primary" />{CHAIN.name}</div>
-        <div className="mt-1 flex items-center gap-1.5 text-muted"><span className="size-1.5 rounded-full bg-success animate-pulse-dot" />Connected · block 6,900,412</div>
+        <div className="flex items-center gap-2 font-medium"><Blocks className="size-4 text-primary" />{chain.network || 'Blockchain'}</div>
+        <div className="mt-1 flex items-center gap-1.5 text-muted">
+          <span className={cn('size-1.5 rounded-full', chain.online ? 'bg-success animate-pulse-dot' : 'bg-danger')} />
+          {chain.online ? `Connected · block ${chain.block?.toLocaleString('en-US')}` : 'Not connected'}
+        </div>
       </div>
     </div>
   )
@@ -112,7 +117,7 @@ export default function DashboardLayout({ role }) {
                 {role === 'voter' && (
                   <button onClick={() => { setMenu(false); navigate('/vote/profile') }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-surface-2"><User className="size-4" />Profile</button>
                 )}
-                <button onClick={() => { logout(); navigate('/') }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-danger hover:bg-danger-soft"><LogOut className="size-4" />Sign out</button>
+                <button onClick={async () => { await logout(); navigate('/') }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-danger hover:bg-danger-soft"><LogOut className="size-4" />Sign out</button>
               </div>
             )}
           </div>

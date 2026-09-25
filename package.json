@@ -1,0 +1,13 @@
+{
+  "name": "votechain",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Tamper-proof elections for any organization, recorded on Ethereum.",
+  "scripts": {
+    "setup": "npm --prefix contracts install && npm --prefix server install && npm --prefix client install",
+    "dev": "node scripts/dev.mjs",
+    "test": "npm --prefix contracts test && npm --prefix server test",
+    "build": "npm --prefix client run build"
+  },
+  "engines": { "node": ">=20.6" }
+}

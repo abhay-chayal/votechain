@@ -1,36 +1,44 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { CheckCircle2, FileSearch, XCircle } from 'lucide-react'
 import { Button, Card, Hash, Input } from '../../components/ui'
-import { findReceipt, useStore } from '../../store/AppStore'
+import { api } from '../../lib/api'
+import { useChainInfo } from '../../store/chain'
 import { fmtDateTime, fmtNum } from '../../lib/utils'
-import { CHAIN } from '../../data/seed'
 
 export default function ReceiptLookup() {
-  const store = useStore()
-  const [code, setCode] = useState('')
+  const chain = useChainInfo()
+  const [params] = useSearchParams()
+  const [code, setCode] = useState(params.get('code') || '')
   const [result, setResult] = useState(undefined)
+  const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  const check = (e) => {
+  const check = async (e) => {
     e.preventDefault()
     setBusy(true)
-    setTimeout(() => { setResult(findReceipt(store, code)); setBusy(false) }, 700)
+    setError('')
+    try {
+      setResult((await api.get(`/public/receipts/${encodeURIComponent(code.trim())}`)).receipt)
+    } catch (err) {
+      if (err.status === 404) setResult(null)
+      else setError(err.message)
+    } finally {
+      setBusy(false)
+    }
   }
-  const election = result && store.electionById(result.electionId)
-  const sample = Object.values(store.myVotes)[0]?.receipt
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:py-16">
       <span className="inline-flex rounded-xl bg-primary-soft p-3 text-primary"><FileSearch className="size-6" /></span>
       <h1 className="mt-4 text-3xl font-bold tracking-tight">Check a vote receipt</h1>
-      <p className="mt-2 text-muted">Enter the receipt code or transaction hash you got after voting. We'll confirm it's recorded on {CHAIN.name}. Your choice is never shown.</p>
+      <p className="mt-2 text-muted">Enter the receipt code or transaction hash you got after voting. We'll confirm it's recorded on {chain.network || 'the blockchain'}. Your choice is never shown.</p>
 
       <form onSubmit={check} className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="VC-XXXX-XXXX or 0x…" className="h-12 font-mono" required />
-        <Button type="submit" size="lg" disabled={busy}>{busy ? 'Checking chain…' : 'Verify'}</Button>
+        <Button type="submit" size="lg" disabled={busy}>{busy ? 'Checking…' : 'Verify'}</Button>
       </form>
-      {sample && <p className="mt-2 text-xs text-muted">Try the demo receipt <button type="button" className="font-mono text-primary hover:underline" onClick={() => setCode(sample)}>{sample}</button></p>}
+      {error && <p className="mt-3 text-sm text-danger">{error}</p>}
 
       {result === null && (
         <Card className="animate-fade-in mt-8 flex gap-3 border-danger/30 p-5">
@@ -46,7 +54,7 @@ export default function ReceiptLookup() {
           <div className="flex items-center gap-2 font-semibold text-success"><CheckCircle2 className="size-5" />Vote found on-chain</div>
           <dl className="mt-5 space-y-3 text-sm">
             {[
-              ['Election', <Link to={`/verify/${result.electionId}`} className="font-medium text-primary hover:underline">{election?.title}</Link>],
+              ['Election', <Link to={`/verify/${result.electionId}`} className="font-medium text-primary hover:underline">{result.electionTitle}</Link>],
               ['Transaction', <Hash value={result.txHash} />],
               ['Block', `#${fmtNum(result.block)}`],
               ['Recorded', fmtDateTime(result.castAt)],

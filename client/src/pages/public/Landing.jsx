@@ -3,8 +3,6 @@ import {
   Landmark, Lock, Users, Wallet, Zap,
 } from 'lucide-react'
 import { Badge, Button, Card, Hash } from '../../components/ui'
-import { useStore } from '../../store/AppStore'
-import { fmtNum, totalVotes } from '../../lib/utils'
 
 const features = [
   { icon: Lock, title: 'Tamper-proof votes', text: 'Every ballot is a transaction on Ethereum. Once confirmed, nobody can edit, delete or replace it, not even us.' },
@@ -29,8 +27,6 @@ const steps = [
 ]
 
 export default function Landing() {
-  const { elections } = useStore()
-  const live = elections.find((e) => e.id === 'el-council-26')
   return (
     <>
       <section className="relative overflow-hidden">
@@ -49,7 +45,7 @@ export default function Landing() {
               <Button size="lg" variant="secondary" to="/login">Try the demo</Button>
             </div>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
-              {['Free for up to 500 voters', 'No wallet for voters', 'Results in real time at close'].map((t) => (
+              {['Sign in with just an email', 'No wallet for voters', 'Results the moment voting closes'].map((t) => (
                 <span key={t} className="flex items-center gap-1.5"><CheckCircle2 className="size-4 text-success" />{t}</span>
               ))}
             </div>
@@ -60,7 +56,7 @@ export default function Landing() {
               <span className="text-sm font-medium text-muted">Vote receipt</span>
               <Badge tone="success"><CheckCircle2 className="size-3.5" />Confirmed</Badge>
             </div>
-            <div className="mt-4 text-lg font-semibold">{live?.title}</div>
+            <div className="mt-4 text-lg font-semibold">Student Council President 2026–27</div>
             <div className="text-sm text-muted">Northfield Institute of Technology</div>
             <dl className="mt-6 space-y-3 text-sm">
               {[
@@ -75,8 +71,8 @@ export default function Landing() {
               ))}
             </dl>
             <div className="mt-4 rounded-lg bg-surface-2 px-4 py-3 text-sm">
-              <span className="font-semibold">{fmtNum(totalVotes(live || { tally: {} }))}</span>
-              <span className="text-muted"> of {fmtNum(live?.eligible || 0)} students have voted so far</span>
+              <span className="font-semibold">885</span>
+              <span className="text-muted"> of 1,240 students have voted so far</span>
             </div>
           </Card>
         </div>

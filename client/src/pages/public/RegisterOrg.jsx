@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Check } from 'lucide-react'
-import { Button, Card, Field, Input, Select, Textarea } from '../../components/ui'
-import { useStore } from '../../store/AppStore'
+import { Button, Card, ErrorText, Field, Input, Select, Textarea } from '../../components/ui'
+import { useAuth } from '../../store/auth'
 import { cn } from '../../lib/utils'
 
 const TYPES = ['University', 'College', 'Company', 'Housing society', 'NGO', 'Club', 'Startup', 'Other']
 
 export default function RegisterOrg() {
-  const { registerOrg } = useStore()
+  const { registerOrg } = useAuth()
+  const [busy, setBusy] = useState(false)
+  const [serverError, setServerError] = useState('')
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
   const [f, setF] = useState({ orgName: '', type: 'University', size: '', website: '', description: '', name: '', email: '', password: '', agree: false })
@@ -30,22 +32,27 @@ export default function RegisterOrg() {
     return !Object.keys(e).length
   }
 
-  const next = (e) => {
+  const next = async (e) => {
     e.preventDefault()
     if (!validate()) return
     if (step === 0) return setStep(1)
-    const id = 'org-' + Date.now().toString(36)
-    registerOrg(
-      { id, name: f.orgName, type: f.type, status: 'active', description: f.description, members: +f.size, admins: [f.name], createdAt: new Date().toISOString(), website: f.website },
-      { id: 'u-' + id, name: f.name, email: f.email, role: 'org_admin', orgId: id },
-    )
-    navigate('/org')
+    setBusy(true)
+    setServerError('')
+    try {
+      const { agree, size, ...rest } = f
+      await registerOrg({ ...rest, size: Number(size) })
+      navigate('/org')
+    } catch (err) {
+      setServerError(err.message)
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
     <div className="mx-auto max-w-xl px-4 py-12 sm:py-16">
       <h1 className="text-2xl font-bold tracking-tight">Register your organization</h1>
-      <p className="mt-1 text-muted">Takes two minutes. New organizations are reviewed within one working day.</p>
+      <p className="mt-1 text-muted">Takes two minutes. You can set up elections right away; publishing opens once VoteChain approves your organization, usually within one working day.</p>
 
       <ol className="my-8 flex items-center gap-3 text-sm">
         {['Organization', 'Your account'].map((l, i) => (
@@ -82,9 +89,10 @@ export default function RegisterOrg() {
               </label>
             </>
           )}
+          <ErrorText>{serverError}</ErrorText>
           <div className="flex justify-between gap-3 pt-2">
             {step === 1 ? <Button type="button" variant="secondary" onClick={() => setStep(0)}>Back</Button> : <span />}
-            <Button type="submit">{step === 0 ? 'Continue' : 'Create organization'}</Button>
+            <Button type="submit" disabled={busy}>{step === 0 ? 'Continue' : busy ? 'Creating…' : 'Create organization'}</Button>
           </div>
         </form>
       </Card>

@@ -3,7 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import { Logo, ThemeToggle } from '../components/brand'
 import { Button } from '../components/ui'
-import { useStore } from '../store/AppStore'
+import { useAuth } from '../store/auth'
 import { cn } from '../lib/utils'
 
 export const homeFor = (role) => ({ platform_admin: '/admin', org_admin: '/org', voter: '/vote' })[role] || '/'
@@ -16,7 +16,7 @@ const links = [
 ]
 
 export default function PublicLayout() {
-  const { user } = useStore()
+  const { user } = useAuth()
   const [open, setOpen] = useState(false)
   const { pathname } = useLocation()
   return (
@@ -63,7 +63,7 @@ export default function PublicLayout() {
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
           <Logo className="text-ink" />
-          <p>Votes recorded on Ethereum (Sepolia testnet). Built as a final-year project, 2026.</p>
+          <p>Every vote is recorded by an open-source smart contract on Ethereum.</p>
         </div>
       </footer>
     </div>
