@@ -49,4 +49,4 @@ npm test
 
 ## Deploying
 
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). In short: contract on Sepolia, API on Render, database on MongoDB Atlas, web app on Vercel.
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). In short: contract on Sepolia, database on MongoDB Atlas, and one Render service that runs the API and serves the web app on a single domain.

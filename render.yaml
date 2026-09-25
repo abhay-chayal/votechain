@@ -1,47 +1,46 @@
-# Render Blueprint for the VoteChain API. In Render: New → Blueprint → pick this repo.
-# Every value marked `sync: false` is asked for once in the Render dashboard; never commit them.
+# Render Blueprint: one web service that runs the API and serves the web app, so the whole
+# product lives on one domain. In Render: New → Blueprint → pick this repository.
+# Values marked `sync: false` are entered once in the Render dashboard. Never commit them.
 services:
   - type: web
-    name: votechain-api
+    name: votechain
     runtime: node
-    rootDir: server
     plan: free
-    buildCommand: npm ci --omit=dev
-    startCommand: npm start
+    buildCommand: npm --prefix client ci --include=dev && npm --prefix client run build && npm --prefix server ci --omit=dev
+    startCommand: npm --prefix server start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION
         value: 20.18.0
-      - key: TRUST_PROXY
-        value: "2"
       - key: CHAIN_NETWORK
         value: sepolia
-      - key: CHAIN_CONFIRMATIONS
-        value: "1"
+      - key: PUBLIC_RPC_URL
+        value: https://ethereum-sepolia-rpc.publicnode.com
+      - key: VITE_SHOW_DEMO_ACCOUNTS
+        value: "false"
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
         generateValue: true
       - key: VOTER_TOKEN_SECRET
         generateValue: true
+      # Your site's address, e.g. https://votechain.onrender.com or https://yourdomain.in
+      - key: CLIENT_URL
+        sync: false
       - key: MONGODB_URI
         sync: false
       - key: RPC_URL
         sync: false
-      - key: PUBLIC_RPC_URL
-        value: https://ethereum-sepolia-rpc.publicnode.com
       - key: RELAYER_PRIVATE_KEY
-        sync: false
-      - key: CLIENT_URL
         sync: false
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
       - key: SMTP_HOST
-        sync: false
+        value: smtp-relay.brevo.com
       - key: SMTP_PORT
         value: "587"
       - key: SMTP_USER

@@ -1,119 +1,132 @@
 # Deploying VoteChain
 
-This takes about an hour the first time. All services used here have free tiers.
+The live setup is **one Render web service**. It runs the API and serves the web app, so everything is on one domain. It uses a MongoDB Atlas database and the VoteChain contract on the Sepolia test network. Every service below has a free tier; a custom domain is the only optional cost.
 
-| Piece | Service | What you need |
-| --- | --- | --- |
-| Source code | GitHub | A repository (Vercel and Render deploy from it) |
-| Smart contract | Ethereum Sepolia testnet | A wallet, free test ETH, an RPC URL |
-| Database | MongoDB Atlas | A free M0 cluster |
-| API | Render | A free web service |
-| Web app | Vercel | A free project |
-| Email | Brevo, Resend or Gmail | SMTP login (optional but needed for real voters) |
+> Never commit a private key, `.env` file or password, and never paste them in chat. They go only into `.env` files on your computer or the Render dashboard.
 
-> Never commit a private key, a `.env` file or a database password. Paste them only into `.env` files on your own computer or into the Render/Vercel dashboards.
+## Accounts you need
+
+| # | Account | Used for | Cost |
+| --- | --- | --- | --- |
+| 1 | GitHub | Hosting the code; Render deploys from it | Free |
+| 2 | MetaMask | The relayer wallet that pays gas for every vote | Free |
+| 3 | A Sepolia faucet | Free test ETH for that wallet | Free |
+| 4 | Alchemy | A private RPC URL so the server can reach Sepolia | Free |
+| 5 | MongoDB Atlas | The database | Free (M0) |
+| 6 | Brevo | Sending sign-in codes and invites by email | Free (300 emails/day) |
+| 7 | Render | Running the app | Free, or $7/month so it never sleeps |
+| 8 | A domain (optional) | e.g. `votechain.in` instead of `votechain.onrender.com` | About ₹600–1,000/year |
 
 ## 1. Push the code to GitHub
 
-Create an empty repository on GitHub, then from `D:\votechain`:
+Create an empty **private** repository on github.com (no README), then in `D:\votechain`:
 
 ```bash
-git remote add origin https://github.com/<you>/votechain.git
+git remote add origin https://github.com/<your-username>/votechain.git
 git push -u origin main
 ```
 
-## 2. Wallet and test ETH
+## 2. Create the relayer wallet and get test ETH
 
-1. Install MetaMask and create a new wallet used only for this project. Don't reuse a wallet that holds real money.
-2. Add the Sepolia network in MetaMask (Settings → Networks → show test networks).
-3. Get free Sepolia ETH from a faucet, for example Google Cloud's Web3 faucet or the Alchemy Sepolia faucet. About 0.1 ETH is plenty: deploying costs roughly 0.005 ETH, and each vote roughly 0.0001 ETH at normal testnet gas prices.
-4. Export the account's private key (MetaMask → account details → show private key). This single wallet will act as both deployer and relayer.
+1. Install the MetaMask browser extension. Create a **new** wallet just for this project, and write the recovery phrase on paper.
+2. In MetaMask, turn on "Show test networks" and switch to **Sepolia**.
+3. Copy your wallet address (0x…) and request test ETH from a faucet, such as Google Cloud's Web3 faucet (Ethereum Sepolia) or Alchemy's Sepolia faucet. Aim for 0.1–0.2 ETH. Deploying costs about 0.005 and each vote about 0.0001, so 0.1 ETH covers roughly 900 votes.
+4. MetaMask → ⋮ → Account details → **Show private key**. You'll need it in steps 4 and 7. Treat it like a password.
 
-## 3. RPC URL
+## 3. Get an RPC URL
 
-Create a free Alchemy (or Infura) account and a Sepolia app. Copy its HTTPS URL, which looks like `https://eth-sepolia.g.alchemy.com/v2/...`.
+Sign up at alchemy.com, create an app, and choose **Ethereum → Sepolia**. Copy the HTTPS URL, which looks like `https://eth-sepolia.g.alchemy.com/v2/abc123…`.
 
-## 4. Deploy the contract
+## 4. Deploy the contract (from your computer)
 
 ```bash
-cd contracts
+cd D:\votechain\contracts
 copy .env.example .env
 ```
 
-Fill in `SEPOLIA_RPC_URL` and `DEPLOYER_PRIVATE_KEY` in `contracts/.env`. Optionally add `ETHERSCAN_API_KEY` from etherscan.io. Then:
+Open `contracts\.env` and fill in `SEPOLIA_RPC_URL` (step 3) and `DEPLOYER_PRIVATE_KEY` (step 2). Leave `RELAYER_ADDRESS` empty so the same wallet is the relayer. Then:
 
 ```bash
 npm run deploy:sepolia
-npm run verify:sepolia
 ```
 
-The deploy writes `server/src/chain/deployment.sepolia.json` (the contract address and ABI, nothing secret). Commit and push it:
+It prints the contract address and writes `server\src\chain\deployment.sepolia.json`. That file is public information and Render needs it, so commit it:
 
 ```bash
+cd D:\votechain
 git add server/src/chain/deployment.sepolia.json
 git commit -m "Deploy VoteChain contract to Sepolia"
 git push
 ```
 
-## 5. MongoDB Atlas
+Optional: get a free API key at etherscan.io, add it as `ETHERSCAN_API_KEY`, and run `npm run verify:sepolia` in `contracts`. Anyone can then read the contract's source code on Etherscan.
 
-1. Create a free M0 cluster.
-2. Database Access: add a user with a strong password.
-3. Network Access: allow `0.0.0.0/0`, because Render's free tier has no fixed IP.
-4. Connect → Drivers: copy the connection string and put the database name `votechain` before the `?`.
+## 5. Create the database
 
-## 6. API on Render
+1. On mongodb.com/atlas, create a free **M0** cluster.
+2. **Database Access** → add a user with a password. Avoid `@` or `/` in the password.
+3. **Network Access** → add `0.0.0.0/0` (Render's free plan has no fixed IP address).
+4. **Connect → Drivers** → copy the connection string, and add the database name before the `?`:
+   `mongodb+srv://user:pass@cluster0.xxxx.mongodb.net/votechain?retryWrites=true&w=majority`
 
-1. In Render: New → Blueprint, then pick your repository. It reads `render.yaml`.
+## 6. Set up email
+
+Voters sign in with a 6-digit code sent by email, so the live site needs this. **Without it, nobody can sign in with an email code.**
+
+1. Sign up at brevo.com and verify the sender email you want to use.
+2. SMTP & API → SMTP: note the **login** and generate an **SMTP key**.
+
+## 7. Deploy on Render
+
+1. On render.com → **New → Blueprint** → connect GitHub → pick the repository. It reads `render.yaml`.
 2. Fill in the values it asks for:
-   - `MONGODB_URI`: from step 5.
-   - `RPC_URL`: from step 3.
-   - `RELAYER_PRIVATE_KEY`: from step 2.
-   - `CLIENT_URL`: your Vercel URL from step 7. You can update it afterwards.
-   - `ADMIN_EMAIL` / `ADMIN_PASSWORD`: your own platform admin login.
-   - SMTP settings: from step 8, or leave blank for now.
-3. Deploy, then open `https://<service>.onrender.com/api/health`. It should return `{"ok":true}`.
 
-On the free plan, Render sleeps after 15 minutes idle, and the first request afterwards takes up to a minute. Open the site a few minutes before a demo.
+| Variable | Value |
+| --- | --- |
+| `CLIENT_URL` | `https://votechain.onrender.com` (the service's URL, or your domain later) |
+| `MONGODB_URI` | from step 5 |
+| `RPC_URL` | from step 3 |
+| `RELAYER_PRIVATE_KEY` | from step 2 |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | the platform admin login you want |
+| `SMTP_USER`, `SMTP_PASS` | from step 6 |
+| `MAIL_FROM` | e.g. `VoteChain <your-verified-sender@gmail.com>` |
 
-## 7. Web app on Vercel
+3. Click **Apply**. The first build takes about 5 minutes. Then open `https://<service>.onrender.com`.
+4. Check: sign in with your admin email, then open **System health**. The database, blockchain RPC and relayer should all show "Operational".
 
-1. In `client/vercel.json`, replace `REPLACE-WITH-YOUR-RENDER-SERVICE` with your Render service name. Commit and push.
-2. In Vercel: Add New → Project, then import the repository. Set the **Root Directory** to `client`. The framework preset is Vite.
-3. Environment variable: `VITE_SHOW_DEMO_ACCOUNTS` = `true` for a college demo, `false` for real use.
-4. Deploy. Then put the Vercel URL into Render's `CLIENT_URL` and redeploy the API.
+On the free plan the service sleeps after 15 minutes idle, and the next visit takes up to a minute. For a live election or a demo, upgrade to the Starter plan ($7/month), or open the site a few minutes beforehand.
 
-The browser only ever talks to the Vercel domain; `/api` is forwarded to Render. That keeps the sign-in cookie first-party, so sessions work in every browser.
+## 8. Use your own domain (optional)
 
-## 8. Email (for real voters)
+1. Buy a domain from any registrar (GoDaddy, Namecheap, Hostinger, …).
+2. Render → your service → **Settings → Custom Domains** → add `votechain.in` and `www.votechain.in`.
+3. At your registrar, add the DNS records Render shows you (an `A` record for the root, a `CNAME` for `www`). HTTPS is set up automatically.
+4. Change `CLIENT_URL` on Render to `https://votechain.in` and redeploy, so links in emails point to your domain.
 
-Voters sign in with a code sent by email. Any SMTP provider works:
+## 9. First real use
 
-- **Brevo** (free, 300 emails/day): SMTP host `smtp-relay.brevo.com`, port 587, plus your SMTP login and key.
-- **Gmail**: host `smtp.gmail.com`, port 587, your address, and an App Password (Google Account → Security → 2-Step Verification → App passwords).
+1. Sign in as the platform admin.
+2. Register an organization at `/register` using another email, then approve it under **Admin → Organizations**.
+3. As that organization, create an election, add 3–4 real email addresses, and publish.
+4. Vote from those accounts, close the election early, publish the results, and open the public results page. All integrity checks should pass.
 
-Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` and `MAIL_FROM` on Render.
+## Optional: demo data on the live site
 
-## 9. Demo data (optional)
+To show the sample organizations and elections live, run the seed once from your computer against the live database. It sends about 40 Sepolia transactions (about 0.005 test ETH).
 
-To fill the live site with the sample organizations and elections, run the seed once from your computer against the production database and Sepolia. It sends about 40 transactions, which costs about 0.005 test ETH.
-
-```bash
-cd server
-copy .env.example .env
-```
-
-In `server/.env`, set `NODE_ENV=production`, `MONGODB_URI`, `CHAIN_NETWORK=sepolia`, `RPC_URL`, `RELAYER_PRIVATE_KEY`, and any long random strings for `JWT_SECRET`, `JWT_REFRESH_SECRET` and `VOTER_TOKEN_SECRET` (required in production mode). Then:
+In `server\.env`, set `NODE_ENV=production`, `MONGODB_URI`, `CHAIN_NETWORK=sepolia`, `RPC_URL`, `RELAYER_PRIVATE_KEY`, and any long random values for `JWT_SECRET`, `JWT_REFRESH_SECRET` and `VOTER_TOKEN_SECRET`. Then:
 
 ```bash
+cd D:\votechain\server
 npm run seed
 ```
 
-In production the seed does not create the demo platform admin. Use your `ADMIN_EMAIL` account instead.
+For the demo-account buttons on the sign-in page, set `VITE_SHOW_DEMO_ACCOUNTS=true` on Render and redeploy. The demo password is public, so turn this off before a real election.
 
 ## Checklist before a real election
 
 - [ ] `VITE_SHOW_DEMO_ACCOUNTS=false`, and no demo data in the database
-- [ ] SMTP configured and a test sign-in code received
-- [ ] Relayer balance covers the number of voters (see Admin → System health)
-- [ ] A trial election with a few people, closed early, checked on the verification page
+- [ ] A sign-in code arrives by email (check the spam folder once)
+- [ ] The relayer has enough test ETH: about 0.0001 per voter, plus a margin (Admin → System health)
+- [ ] Render is on a plan that doesn't sleep, or the site was opened just before voting starts
+- [ ] A trial election with a few people, closed early and checked on the public results page
