@@ -25,8 +25,13 @@ async function main() {
   }
   await ensureAdmin()
   if (config.seedOnStart) {
-    const { seed } = await import('../scripts/seed-data.js')
-    await seed()
+    // A failed seed must not take the whole API down with it; the app still works without demo data.
+    try {
+      const { seed } = await import('../scripts/seed-data.js')
+      await seed()
+    } catch (err) {
+      console.error('[seed] Demo data could not be created:', err.message)
+    }
   }
 
   const app = createApp()

@@ -105,6 +105,11 @@ class EthersChain {
     const e = await this.read(() => this.contract.getElection(BigInt(electionId)))
     return { voteCount: Number(e.voteCount), closed: e.closed, startTime: Number(e.startTime), endTime: Number(e.endTime), voterRoot: e.voterRoot, detailsHash: e.detailsHash }
   }
+  /** The chain's current time (latest block timestamp, in seconds). It can lag the server's clock. */
+  async now() {
+    const b = await this.read(() => this.provider.getBlock('latest'))
+    return b.timestamp
+  }
   async status() {
     const [block, balance, net] = await Promise.all([
       this.provider.getBlockNumber(), this.provider.getBalance(this.wallet.address), this.provider.getNetwork(),

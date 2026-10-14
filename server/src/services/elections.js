@@ -79,6 +79,11 @@ export async function publishElection(e, actor) {
   if (new Date(e.startAt) < new Date()) e.startAt = new Date() // "start now"
   validateForChain(e)
 
+  // "Start now" must mean now on the blockchain. Block time can run a few seconds behind the
+  // server's clock; stamping the start from the server would put it in the chain's future,
+  // and the contract would reject the first votes as "not open yet".
+  if (toSec(e.startAt) <= toSec(Date.now())) e.startAt = new Date(Math.min(await chainNowSec(), toSec(e.startAt)) * 1000)
+
   const tree = await voterTree(e)
   const hash = detailsHash(e)
   const id = onChainId(e._id)
@@ -99,6 +104,10 @@ export async function publishElection(e, actor) {
   const invites = await Invite.find({ electionId: e._id }).lean()
   sendBulk(invites, () => templates.invite(e, org)).catch(() => {})
   return e
+}
+
+async function chainNowSec() {
+  try { return (await getChain().now?.()) ?? toSec(Date.now()) } catch { return toSec(Date.now()) }
 }
 
 /** Pushes edited details / voter list to the contract. Only possible before voting opens. */
