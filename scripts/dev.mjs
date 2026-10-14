@@ -5,6 +5,7 @@
 //   4. starts the web app on :5173
 // Ctrl+C stops everything.
 import { spawn } from 'node:child_process'
+import net from 'node:net'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -49,6 +50,20 @@ function stopAll() {
 }
 process.on('SIGINT', () => { stopAll(); process.exit(0) })
 process.on('SIGTERM', () => { stopAll(); process.exit(0) })
+
+const portFree = (port) => new Promise((resolve) => {
+  const s = net.createServer().once('error', () => resolve(false)).once('listening', () => s.close(() => resolve(true)))
+  s.listen(port)
+})
+
+// A leftover API or web server from an earlier run would answer with data from an old
+// blockchain, so refuse to start rather than mix the two.
+for (const [port, what] of [[4000, 'API'], [5173, 'web app']]) {
+  if (!(await portFree(port))) {
+    console.error(`[dev] Port ${port} is already in use, probably by a VoteChain ${what} from an earlier run. Stop it (close that terminal, or end the node process) and run npm run dev again.`)
+    process.exit(1)
+  }
+}
 
 if (await chainUp()) {
   console.log('[dev] Reusing the blockchain already running on :8545')

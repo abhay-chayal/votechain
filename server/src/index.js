@@ -24,6 +24,18 @@ async function main() {
     console.warn(`[chain] Not reachable yet: ${err.message}`)
   }
   await ensureAdmin()
+
+  // Claim the port before seeding, so a second copy fails fast instead of writing demo data
+  // to the chain and then crashing while an old copy keeps answering requests.
+  const app = createApp()
+  await new Promise((resolve, reject) => {
+    const server = app.listen(config.port, resolve)
+    server.on('error', (err) => reject(err.code === 'EADDRINUSE'
+      ? new Error(`Port ${config.port} is already in use. Another VoteChain API is probably still running; stop it first.`)
+      : err))
+  })
+  console.log(`[api] Listening on http://localhost:${config.port}`)
+
   if (config.seedOnStart) {
     // A failed seed must not take the whole API down with it; the app still works without demo data.
     try {
@@ -33,9 +45,6 @@ async function main() {
       console.error('[seed] Demo data could not be created:', err.message)
     }
   }
-
-  const app = createApp()
-  app.listen(config.port, () => console.log(`[api] Listening on http://localhost:${config.port}`))
 
   // Close elections whose end time has passed and cache their results.
   setInterval(() => closeExpired().catch((err) => console.error('[jobs] closeExpired:', err.message)), 60_000)

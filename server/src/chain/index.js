@@ -22,7 +22,7 @@ const FRIENDLY = {
   InvalidMerkleProof: 'This voter is not on the election\'s voter list.',
   InvalidCandidate: 'That candidate is not on the ballot.',
   ElectionExists: 'This election is already on-chain.',
-  ElectionNotFound: 'This election was not found on-chain.',
+  ElectionNotFound: 'This election is missing from the contract. If you are running locally, the blockchain was restarted after the election was published; restart npm run dev to reset everything.',
   ElectionAlreadyClosed: 'This election is already closed.',
   ElectionStillRunning: 'Results are sealed until voting closes.',
   AlreadyStarted: 'Voting has already started, so the election can no longer be changed.',
