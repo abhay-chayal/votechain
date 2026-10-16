@@ -13,9 +13,19 @@ export async function connectDb(uri = config.mongoUri) {
   if (!uri) {
     if (config.isProd) throw new Error('MONGODB_URI is required in production')
     const { MongoMemoryServer } = await import('mongodb-memory-server')
-    memoryServer = await MongoMemoryServer.create()
+    // A fixed port in development so the data can be browsed with MongoDB Compass.
+    // Tests (and a busy port) fall back to a random one.
+    const port = config.isTest ? undefined : Number(process.env.MONGO_MEMORY_PORT || 27018)
+    try {
+      memoryServer = await MongoMemoryServer.create(port ? { instance: { port } } : undefined)
+    } catch {
+      memoryServer = await MongoMemoryServer.create()
+    }
     uri = memoryServer.getUri('votechain')
-    if (!config.isTest) console.log('[db] Using embedded in-memory MongoDB (data resets on restart)')
+    if (!config.isTest) {
+      console.log('[db] Using embedded in-memory MongoDB (data resets on restart)')
+      console.log(`[db] Browse it in MongoDB Compass: ${uri}`)
+    }
   }
   mongoose.set('strictQuery', true)
   await mongoose.connect(uri)
