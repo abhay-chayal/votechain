@@ -8,6 +8,7 @@ import { cn, electionStatus, fmtDateTime, fmtNum } from '../../lib/utils'
 
 const STEPS = ['Details', 'Candidates', 'Voters', 'Review']
 const CATEGORIES = ['Student council', 'Department', 'Club', 'Hostel', 'Committee', 'Board resolution', 'Poll', 'Other']
+const GENDERS = ['Male', 'Female', 'Other', 'Prefer not to say']
 const EMAIL = /[^\s,;<>"]+@[^\s,;<>"]+\.[^\s,;<>"]+/
 
 const toLocal = (iso) => { const d = new Date(iso); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16) }
@@ -27,7 +28,16 @@ export function parseVoters(text) {
       const cells = line.split(',').map((c) => c.trim().replace(/^"|"$/g, ''))
       const get = (...names) => cells[cols.findIndex((c) => names.includes(c))] || ''
       const email = get('email', 'emailaddress').toLowerCase()
-      if (EMAIL.test(email)) out.set(email, { email, name: get('name', 'fullname'), memberId: get('memberid', 'id', 'rollno', 'rollnumber', 'employeeid') })
+      if (!EMAIL.test(email)) continue
+      const v = { email, name: get('name', 'fullname'), memberId: get('memberid', 'id', 'rollno', 'rollnumber', 'employeeid') }
+      // Optional demographics for aggregate turnout analytics.
+      const by = parseInt(get('birthyear', 'yearofbirth', 'yob'), 10)
+      if (by >= 1900 && by <= new Date().getFullYear()) v.birthYear = by
+      const g = GENDERS.find((x) => x.toLowerCase() === get('gender', 'sex').toLowerCase())
+      if (g) v.gender = g
+      const st = get('state', 'region')
+      if (st) v.state = st
+      out.set(email, v)
     } else {
       for (const m of line.matchAll(new RegExp(EMAIL, 'g'))) out.set(m[0].toLowerCase(), { email: m[0].toLowerCase() })
     }
@@ -216,7 +226,7 @@ export default function ElectionEditor() {
           <div className="grid gap-6 lg:grid-cols-2">
             <div>
               <h3 className="font-semibold">Upload a CSV</h3>
-              <p className="mt-1 text-sm text-muted">Columns: <code className="font-mono text-xs">name, email, member id</code>. Each voter gets an email invite when you publish.</p>
+              <p className="mt-1 text-sm text-muted">Columns: <code className="font-mono text-xs">name, email, member id</code>, optionally <code className="font-mono text-xs">birth year, gender, state</code> for anonymous turnout statistics. Each voter gets an email invite when you publish.</p>
               <label className="mt-4 flex cursor-pointer flex-col items-center rounded-lg border-2 border-dashed border-line px-6 py-10 text-center hover:border-primary">
                 <FileUp className="size-7 text-muted" />
                 <span className="mt-3 text-sm font-medium">{fileVoters ? fileVoters.name : 'Choose a CSV file'}</span>

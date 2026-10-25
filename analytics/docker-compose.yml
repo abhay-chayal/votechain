@@ -1,0 +1,17 @@
+services:
+  hadoop:
+    build: ./hadoop
+    image: votechain-hadoop:1.0
+    container_name: votechain-hadoop
+    hostname: localhost
+    ports:
+      - "9870:9870"   # HDFS NameNode web UI
+      - "8088:8088"   # YARN ResourceManager web UI
+      - "19888:19888" # MapReduce JobHistory web UI
+    volumes:
+      - ./:/work                 # scripts, data and results from this folder
+      - hadoop-data:/data        # HDFS blocks and the Hive metastore survive restarts
+    mem_limit: 8g
+
+volumes:
+  hadoop-data:

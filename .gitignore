@@ -14,3 +14,8 @@ contracts/typechain-types/
 # Local chain deployments change on every run
 server/src/chain/deployment.localhost.json
 server/node_modules/.cache/
+
+# Analytics: large generated data (recreate with analytics/generator/generate_data.py)
+analytics/data/
+analytics/data-live/
+analytics/output/mapreduce-local/

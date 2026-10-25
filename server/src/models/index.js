@@ -70,6 +70,10 @@ const InviteSchema = new Schema({
   email: { type: String, required: true, lowercase: true, trim: true },
   name: { type: String, default: '' },
   memberId: { type: String, default: '' },
+  // Optional, consented demographics. Used only for aggregate turnout analytics, never linked to a choice.
+  birthYear: Number,
+  gender: { type: String, enum: ['Male', 'Female', 'Other', 'Prefer not to say'] },
+  state: String,
   voterToken: { type: String, required: true },
   status: { type: String, enum: ['invited', 'pending', 'voted'], default: 'invited' },
   votedAt: Date,

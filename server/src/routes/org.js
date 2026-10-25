@@ -168,7 +168,10 @@ r.get('/elections/:id/voters.csv', ah(async (req, res) => {
 r.post('/elections/:id/voters', ah(async (req, res) => {
   const e = await ownElection(req)
   const b = parse(z.object({
-    voters: z.array(z.object({ email: z.string().trim().toLowerCase().email(), name: z.string().trim().max(120).optional(), memberId: z.string().trim().max(60).optional() })).min(1).max(10_000),
+    voters: z.array(z.object({ email: z.string().trim().toLowerCase().email(), name: z.string().trim().max(120).optional(), memberId: z.string().trim().max(60).optional(),
+      birthYear: z.coerce.number().int().min(1900).max(new Date().getFullYear()).optional(),
+      gender: z.enum(['Male', 'Female', 'Other', 'Prefer not to say']).optional(),
+      state: z.string().trim().max(60).optional() })).min(1).max(10_000),
   }), req.body)
   const result = await svc.addVoters(e, b.voters)
   if (result.added) await svc.logActivity(e, `${result.added} voters added to ${e.title}`, 'invite', actor(req))

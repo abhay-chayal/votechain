@@ -1,0 +1,15 @@
+{
+  "participation_rows": 2000056,
+  "elections": 6669,
+  "overall_turnout_pct": 60.68,
+  "signed_in_pct": 70.51,
+  "avg_margin_pct": 28.98,
+  "close_contest_pct": 13.56,
+  "landslide_pct": 41.99,
+  "consistency": {
+    "mapreduce_age_group": "match",
+    "mapreduce_gender": "match",
+    "mapreduce_org_type": "match",
+    "mapreduce_state": "match"
+  }
+}

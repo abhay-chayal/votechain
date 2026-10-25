@@ -43,7 +43,7 @@ export async function addVoters(e, voters) {
     ops.push({
       updateOne: {
         filter: { electionId: e._id, email },
-        update: { $set: { name: v.name || '', memberId: v.memberId || '' }, $setOnInsert: { orgId: e.orgId, voterToken: voterToken(String(e._id), email), status: 'invited' } },
+        update: { $set: { name: v.name || '', memberId: v.memberId || '', ...(v.birthYear ? { birthYear: v.birthYear } : {}), ...(v.gender ? { gender: v.gender } : {}), ...(v.state ? { state: v.state } : {}) }, $setOnInsert: { orgId: e.orgId, voterToken: voterToken(String(e._id), email), status: 'invited' } },
         upsert: true,
       },
     })

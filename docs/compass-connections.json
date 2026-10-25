@@ -1,0 +1,11 @@
+{
+  "type": "Compass Connections",
+  "version": { "$numberInt": "1" },
+  "connections": [
+    {
+      "id": "6f1c2a8e-4b7d-4e0a-9c3f-2d5b8a1e7c40",
+      "connectionOptions": { "connectionString": "mongodb://127.0.0.1:27018/votechain" },
+      "favorite": { "name": "VoteChain (local, npm run dev)", "color": "color2" }
+    }
+  ]
+}
